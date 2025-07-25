@@ -17,11 +17,23 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Version information - set by GoReleaser
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
 func init() {
 	log.SetFlags(0)
 }
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "--version" {
+		fmt.Printf("policy-bot-tests version %s (commit: %s, built: %s)\n", version, commit, date)
+		return
+	}
+
 	evaluator, err := loadPolicyEvaluator(".policy.yml")
 	if err != nil {
 		log.Fatalf("Failed to load evaluator: %v", err)
