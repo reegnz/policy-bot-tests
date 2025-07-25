@@ -46,3 +46,51 @@ PASS
 --- Summary ---
 4 / 4 tests passed.
 ```
+
+## Installation
+
+### Using Homebrew
+
+```bash
+brew install reegnz/tap/policy-bot-tests
+```
+
+### Manual Installation
+
+Download the latest release from [GitHub Releases](https://github.com/reegnz/policy-bot-tests/releases) and extract the binary for your platform.
+
+### Docker
+
+```bash
+docker pull ghcr.io/reegnz/policy-bot-tests:latest
+docker run ghcr.io/reegnz/policy-bot-tests:latest
+```
+
+## Development
+
+### Building from source
+
+```bash
+git clone https://github.com/reegnz/policy-bot-tests.git
+cd policy-bot-tests
+go build -o policy-bot-tests .
+```
+
+### Running tests
+
+```bash
+go test -v ./...
+```
+
+### Local GoReleaser testing
+
+```bash
+# Install GoReleaser
+go install github.com/goreleaser/goreleaser@latest
+
+# Test build locally
+goreleaser build --snapshot --clean
+
+# Test release locally (dry run)
+goreleaser release --snapshot --clean
+```
