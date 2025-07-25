@@ -4,7 +4,7 @@ This tool can be used to write tests against a [policy-bot](https://github.com/p
 
 ## Example
 
-Given this [.policy.yml](./tests/.policy.yml) and this [.policy-tests.yml](./tests/policy-tests.yml)
+Given this [.policy.yml](./tests/.policy.yml) and this [.policy-tests.yml](./tests/.policy-tests.yml)
 you'll get the following test output:
 
 ```sh
