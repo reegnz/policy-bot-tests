@@ -1,0 +1,29 @@
+---
+policy:
+  approval:
+  - team-alpha-review
+  - team-beta-review
+
+approval_rules:
+- name: team-alpha-review
+  if:
+    targets_branch:
+      pattern: ^main$
+    changed_files:
+      paths:
+      - ^team-alpha/.*$
+  requires:
+    count: 1
+    teams:
+    - test/team-alpha
+- name: team-beta-review
+  if:
+    targets_branch:
+      pattern: ^main$
+    changed_files:
+      paths:
+      - ^team-beta/.*$
+  requires:
+    count: 1
+    teams:
+    - test/team-beta

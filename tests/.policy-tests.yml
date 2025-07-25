@@ -1,0 +1,80 @@
+---
+defaultContext:
+  owner: test
+  repo: test
+  pr:
+    baseRefName: main
+    headRefName: feature/changes
+  teamMembers:
+    test/team-alpha:
+    - alpha-alice
+    - alpha-bob
+    - alpha-charlie
+    test/team-beta:
+    - beta-alice
+    - beta-bob
+    - beta-charlie
+testCases:
+- name: Pass policy when team alpha files change and team alpha approves
+  context:
+    filesChanged:
+    - team-alpha/file.txt
+    pr:
+      author: alpha-alice
+    reviews:
+    - author: alpha-bob
+      state: approved
+  assert:
+    evaluationStatus: approved
+    approvedRules:
+    - team-alpha-review
+
+- name: Fail policy when team alpha files change and only PR author approves
+  context:
+    filesChanged:
+    - team-alpha/file.txt
+    pr:
+      author: alpha-alice
+    reviews:
+    - author: alpha-alice
+      state: approved
+  assert:
+    evaluationStatus: pending
+    pendingRules:
+    - team-alpha-review
+
+- name: Pass policy when multiple team files are changing with multiple team approvals
+  context:
+    filesChanged:
+    - team-alpha/file.txt
+    - team-beta/file.txt
+    pr:
+      author: alpha-alice
+    reviews:
+    - author: alpha-bob
+      state: approved
+    - author: beta-charlie
+      state: approved
+  assert:
+    evaluationStatus: approved
+    approvedRules:
+    - team-alpha-review
+    - team-beta-review
+
+
+- name: Fail policy when multiple team files are changing with review missing from beta team
+  context:
+    filesChanged:
+    - team-alpha/file.txt
+    - team-beta/file.txt
+    pr:
+      author: alpha-alice
+    reviews:
+    - author: alpha-bob
+      state: approved
+  assert:
+    evaluationStatus: pending
+    approvedRules:
+    - team-alpha-review
+    pendingRules:
+    - team-beta-review
