@@ -1,36 +1,33 @@
+---
 version: 2
 
 before:
   hooks:
-    - go mod tidy
+  - go mod tidy
 
 builds:
-  - env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
-    goarch:
-      - amd64
-      - arm64
-    binary: policy-bot-tests
-    ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
-    main: .
+- env:
+  - CGO_ENABLED=0
+  goos:
+  - linux
+  - windows
+  - darwin
+  goarch:
+  - amd64
+  - arm64
+  binary: policy-bot-tests
+  ldflags:
+  - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}}
+  main: .
 
 archives:
-  - name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-    files:
-      - README.md
-      - LICENSE
-      - tests/.policy.yml
-      - tests/.policy-tests.yml
+- name_template: >-
+    {{ .ProjectName }}_ {{- title .Os }}_ {{- if eq .Arch "amd64" }}x86_64 {{- else if eq .Arch "386" }}i386 {{- else }}{{ .Arch }}{{ end }}
+  files:
+  - README.md
+  - LICENSE
+  - tests/.policy.yml
+  - tests/.policy-tests.yml
 
 checksum:
   name_template: 'checksums.txt'
@@ -39,15 +36,15 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^ci:'
-      - Merge pull request
-      - Merge branch
+    - '^docs:'
+    - '^test:'
+    - '^ci:'
+    - Merge pull request
+    - Merge branch
 
 release:
   draft: false
-  prerelease: false
+  prerelease: auto
   name_template: '{{ .ProjectName }} {{ .Version }}'
   footer: |
     ## Installation
@@ -64,3 +61,14 @@ release:
     ```bash
     docker pull ghcr.io/reegnz/policy-bot-tests:latest
     ```
+
+# Produces docker images:
+kos:
+- repositories:
+  - reegnz/policy-bot-tests
+  tags:
+  - "{{.Version}}"
+  - latest
+  platforms:
+  - linux/amd64
+  - linux/arm64

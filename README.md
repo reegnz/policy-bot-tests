@@ -49,11 +49,6 @@ PASS
 
 ## Installation
 
-### Using Homebrew
-
-```bash
-brew install reegnz/tap/policy-bot-tests
-```
 
 ### Manual Installation
 
@@ -63,7 +58,7 @@ Download the latest release from [GitHub Releases](https://github.com/reegnz/pol
 
 ```bash
 docker pull ghcr.io/reegnz/policy-bot-tests:latest
-docker run ghcr.io/reegnz/policy-bot-tests:latest
+docker run -it --rm --workdir=/data --volume $PWD/:/data/ ghcr.io/reegnz/policy-bot-tests:latest
 ```
 
 ## Development
