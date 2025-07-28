@@ -49,17 +49,9 @@ PASS
 
 ## Installation
 
-
 ### Manual Installation
 
 Download the latest release from [GitHub Releases](https://github.com/reegnz/policy-bot-tests/releases) and extract the binary for your platform.
-
-### Docker
-
-```bash
-docker pull ghcr.io/reegnz/policy-bot-tests:latest
-docker run -it --rm --workdir=/data --volume $PWD/:/data/ ghcr.io/reegnz/policy-bot-tests:latest
-```
 
 ## Development
 
