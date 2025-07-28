@@ -61,14 +61,3 @@ release:
     ```bash
     docker pull ghcr.io/reegnz/policy-bot-tests:latest
     ```
-
-# Produces docker images:
-kos:
-- repositories:
-  - reegnz/policy-bot-tests
-  tags:
-  - "{{.Version}}"
-  - latest
-  platforms:
-  - linux/amd64
-  - linux/arm64
