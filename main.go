@@ -65,7 +65,7 @@ func loadTestFile(fileName string) (*TestFile, error) {
 		return nil, fmt.Errorf("failed to load file %s: %w", fileName, err)
 	}
 	var tests TestFile
-	if err := yaml.Unmarshal(testFile, &tests); err != nil {
+	if err := yaml.UnmarshalStrict(testFile, &tests); err != nil {
 		log.Fatalf("Failed to unmarshal .policy-tests.yml: %v", err)
 	}
 	return &tests, nil
