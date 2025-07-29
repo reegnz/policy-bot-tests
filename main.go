@@ -254,13 +254,10 @@ func newPullContext(tc TestContext) pull.Context {
 			baseRefName: tc.PR.BaseRefName,
 			headRefName: tc.PR.HeadRefName,
 		},
-		reviews: reviews,
-		files:   files,
-		labels:  tc.Tags,
-		GitHubMembershipContext: GitHubMembershipContext{
-			teamMembers: tc.TeamMembers,
-			orgMembers:  tc.OrgMembers,
-		},
-		evalTimestamp: time.Now(),
+		reviews:                 reviews,
+		files:                   files,
+		labels:                  tc.Tags,
+		GitHubMembershipContext: *NewGitHubMembershipContext(tc.TeamMembers, tc.OrgMembers),
+		evalTimestamp:           time.Now(),
 	}
 }
