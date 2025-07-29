@@ -193,7 +193,14 @@ func printResultTree(result *common.Result, indent string) {
 	}
 
 	log.Printf("%s- %s %s: %s\n", indent, statusIcon, result.Name, result.StatusDescription)
-	for _, child := range result.Children {
+
+	// Sort children by status: Approved > Pending > Skipped
+	sortedChildren := slices.Clone(result.Children)
+	slices.SortFunc(sortedChildren, func(a, b *common.Result) int {
+		return int(b.Status) - int(a.Status)
+	})
+
+	for _, child := range sortedChildren {
 		printResultTree(child, indent+"  ")
 	}
 }
