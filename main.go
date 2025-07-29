@@ -26,10 +26,15 @@ var (
 	date    = "unknown"
 )
 
-var filter string
+var (
+	verbose bool
+	filter  string
+)
 
 func init() {
 	log.SetFlags(0)
+	flag.BoolVar(&verbose, "verbose", false, "print detailed evaluation trees for all tests")
+	flag.BoolVar(&verbose, "v", false, "print detailed evaluation trees for all tests (shorthand)")
 	flag.StringVar(&filter, "filter", "", "filter tests by name using a regex")
 	flag.StringVar(&filter, "f", "", "filter tests by name using a regex (shorthand)")
 }
@@ -114,8 +119,11 @@ func runTests(evaluator common.Evaluator, tests *TestFile) (passed bool) {
 		result := evaluator.Evaluate(context.Background(), pullContext)
 
 		pass := checkAssertions(tc.Assert, &result)
-		log.Println("  - Evaluation Tree:")
-		printResultTree(&result, "    ")
+		if !pass || verbose {
+			log.Println("  - Evaluation Tree:")
+			printResultTree(&result, "    ")
+		}
+
 		if pass {
 			passedCount++
 			log.Println("\033[32mPASS\033[0m")
