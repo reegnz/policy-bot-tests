@@ -18,20 +18,39 @@ type GitHubMembershipContext struct {
 	teamMembers map[string][]string
 }
 
+// NewGitHubMembershipContext creates a NewGitHubMembershipContext
+// the teamMembers and orgMembers maps are transformed so the keys are all lowercase
+func NewGitHubMembershipContext(teamMembers, orgMembers map[string][]string) *GitHubMembershipContext {
+	tm := map[string][]string{}
+	for k, v := range teamMembers {
+		tm[strings.ToLower(k)] = v
+	}
+
+	om := map[string][]string{}
+	for k, v := range orgMembers {
+		om[strings.ToLower(k)] = v
+	}
+
+	return &GitHubMembershipContext{
+		teamMembers: tm,
+		orgMembers:  om,
+	}
+}
+
 func (mc *GitHubMembershipContext) IsTeamMember(team, user string) (bool, error) {
-	return slices.Contains(mc.teamMembers[team], user), nil
+	return slices.Contains(mc.teamMembers[strings.ToLower(team)], user), nil
 }
 
 func (mc *GitHubMembershipContext) IsOrgMember(org, user string) (bool, error) {
-	return slices.Contains(mc.orgMembers[org], user), nil
+	return slices.Contains(mc.orgMembers[strings.ToLower(org)], user), nil
 }
 
 func (mc *GitHubMembershipContext) TeamMembers(team string) ([]string, error) {
-	return mc.teamMembers[team], nil
+	return mc.teamMembers[strings.ToLower(team)], nil
 }
 
 func (mc *GitHubMembershipContext) OrganizationMembers(org string) ([]string, error) {
-	return mc.orgMembers[org], nil
+	return mc.orgMembers[strings.ToLower(org)], nil
 }
 
 type GitHubContext struct {
