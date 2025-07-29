@@ -27,8 +27,9 @@ var (
 )
 
 var (
-	verbose bool
-	filter  string
+	verbose          bool
+	filter           string
+	showSkippedRules bool
 )
 
 func init() {
@@ -37,6 +38,7 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "print detailed evaluation trees for all tests (shorthand)")
 	flag.StringVar(&filter, "filter", "", "filter tests by name using a regex")
 	flag.StringVar(&filter, "f", "", "filter tests by name using a regex (shorthand)")
+	flag.BoolVar(&showSkippedRules, "show-skipped-rules", false, "show skipped rules in the evaluation tree")
 }
 
 func main() {
@@ -209,6 +211,9 @@ func printResultTree(result *common.Result, indent string) {
 	})
 
 	for _, child := range sortedChildren {
+		if child.Status == common.StatusSkipped && !showSkippedRules {
+			continue
+		}
 		printResultTree(child, indent+"  ")
 	}
 }
