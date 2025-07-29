@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"maps"
 	"os"
 	"reflect"
+	"regexp"
 	"slices"
 	"strings"
 	"time"
@@ -24,11 +26,16 @@ var (
 	date    = "unknown"
 )
 
+var filter string
+
 func init() {
 	log.SetFlags(0)
+	flag.StringVar(&filter, "filter", "", "filter tests by name using a regex")
+	flag.StringVar(&filter, "f", "", "filter tests by name using a regex (shorthand)")
 }
 
 func main() {
+	flag.Parse()
 	if len(os.Args) > 1 && os.Args[1] == "--version" {
 		fmt.Printf("policy-bot-tests version %s (commit: %s, built: %s)\n", version, commit, date)
 		return
@@ -72,9 +79,34 @@ func loadTestFile(fileName string) (*TestFile, error) {
 }
 
 func runTests(evaluator common.Evaluator, tests *TestFile) (passed bool) {
-	log.Printf("Found %d test case(s)\n", len(tests.TestCases))
+	var filterRegex *regexp.Regexp
+	var err error
+	if filter != "" {
+		filterRegex, err = regexp.Compile(filter)
+		if err != nil {
+			log.Fatalf("Invalid filter regex: %v", err)
+		}
+	}
+
+	var filteredCases []TestCase
+	if filterRegex != nil {
+		for _, tc := range tests.TestCases {
+			if filterRegex.MatchString(tc.Name) {
+				filteredCases = append(filteredCases, tc)
+			}
+		}
+	} else {
+		filteredCases = tests.TestCases
+	}
+
+	if len(filteredCases) == 0 {
+		log.Printf("No test cases matched the filter: %s", filter)
+		return true
+	}
+
+	log.Printf("Running %d of %d total test case(s)\n", len(filteredCases), len(tests.TestCases))
 	passedCount := 0
-	for _, tc := range tests.TestCases {
+	for _, tc := range filteredCases {
 		log.Printf("--- Running Test: %s ---\n", tc.Name)
 
 		mergedContext := mergeContexts(tests.DefaultContext, tc.Context)
@@ -91,8 +123,8 @@ func runTests(evaluator common.Evaluator, tests *TestFile) (passed bool) {
 			log.Println("\033[31mFAIL\033[0m")
 		}
 	}
-	log.Printf("\n--- Summary ---\n%d / %d tests passed.\n", passedCount, len(tests.TestCases))
-	passed = passedCount == len(tests.TestCases)
+	log.Printf("\n--- Summary ---\n%d / %d tests passed.\n", passedCount, len(filteredCases))
+	passed = passedCount == len(filteredCases)
 	return
 }
 
