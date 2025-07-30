@@ -30,6 +30,7 @@ var (
 	verbose          bool
 	filter           string
 	showSkippedRules bool
+	showTestContext  bool
 )
 
 func init() {
@@ -39,6 +40,7 @@ func init() {
 	flag.StringVar(&filter, "filter", "", "filter tests by name using a regex")
 	flag.StringVar(&filter, "f", "", "filter tests by name using a regex (shorthand)")
 	flag.BoolVar(&showSkippedRules, "show-skipped-rules", false, "show skipped rules in the evaluation tree")
+	flag.BoolVar(&showTestContext, "show-test-context", false, "show the test context for each test case")
 }
 
 func main() {
@@ -122,7 +124,11 @@ func runTests(evaluator common.Evaluator, tests *TestFile) (passed bool) {
 
 		pass := checkAssertions(tc.Assert, &result)
 		if !pass || verbose {
-			log.Println("  - Evaluation Tree:")
+			if showTestContext {
+				log.Println("  - Test Context:")
+				printTestContext(mergedContext, "    ")
+			}
+			log.Println("  - Policy Evaluation Tree:")
 			printResultTree(&result, "    ")
 		}
 
@@ -187,6 +193,40 @@ func collectRuleStatuses(result *common.Result) (approved, pending, skipped []st
 		return nil, nil, []string{result.Name}
 	}
 	return nil, nil, nil
+}
+
+func printTestContext(tc TestContext, indent string) {
+	log.Printf("%s- Author: %s", indent, tc.PR.Author)
+	if len(tc.FilesChanged) > 0 {
+		log.Printf("%s- Changed Files:", indent)
+		for _, file := range tc.FilesChanged {
+			log.Printf("%s  - %s", indent, file)
+		}
+	}
+	if len(tc.Reviews) > 0 {
+		log.Printf("%s- Reviews:", indent)
+		for _, r := range tc.Reviews {
+			log.Printf("%s  - %s (%s)", indent, r.Author, r.State)
+		}
+	}
+	if len(tc.Tags) > 0 {
+		log.Printf("%s- Labels:", indent)
+		for _, tag := range tc.Tags {
+			log.Printf("%s  - %s", indent, tag)
+		}
+	}
+	if len(tc.Statuses) > 0 {
+		log.Printf("%s- Statuses:", indent)
+		for k, v := range tc.Statuses {
+			log.Printf("%s  - %s: %s", indent, k, v)
+		}
+	}
+	if len(tc.WorkflowRuns) > 0 {
+		log.Printf("%s- Workflows:", indent)
+		for k, v := range tc.WorkflowRuns {
+			log.Printf("%s  - %s: %s", indent, k, strings.Join(v, ", "))
+		}
+	}
 }
 
 func printResultTree(result *common.Result, indent string) {
