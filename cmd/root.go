@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/reegnz/policy-bot-tests/internal/loader"
 	"github.com/reegnz/policy-bot-tests/internal/runner"
@@ -25,9 +26,10 @@ var (
 // NewRootCommand creates the root command for the CLI
 func NewRootCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "policy-bot-tests",
+		Use:   "policy-bot-tests [directory]",
 		Short: "Run tests for policy-bot configurations",
 		Long:  "A testing tool for policy-bot configurations that loads test cases and evaluates them against a policy file.",
+		Args:  cobra.MaximumNArgs(1),
 		RunE:  runMain,
 	}
 
@@ -49,11 +51,20 @@ func Execute() {
 }
 
 func runMain(cmd *cobra.Command, args []string) error {
-	evaluator, err := loader.LoadPolicyEvaluator(".policy.yml")
+	// Default to current directory if no argument provided
+	directory := "."
+	if len(args) > 0 {
+		directory = args[0]
+	}
+
+	policyFile := filepath.Join(directory, ".policy.yml")
+	testFile := filepath.Join(directory, ".policy-tests.yml")
+
+	evaluator, err := loader.LoadPolicyEvaluator(policyFile)
 	if err != nil {
 		return fmt.Errorf("failed to load evaluator: %w", err)
 	}
-	tests, err := loader.LoadTestFile(".policy-tests.yml")
+	tests, err := loader.LoadTestFile(testFile)
 	if err != nil {
 		return fmt.Errorf("failed to load tests: %w", err)
 	}
