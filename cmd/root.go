@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/reegnz/policy-bot-tests/internal/loader"
-	"github.com/reegnz/policy-bot-tests/internal/output"
 	"github.com/reegnz/policy-bot-tests/internal/runner"
 	"github.com/spf13/cobra"
 )
@@ -58,7 +57,7 @@ func runMain(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to load tests: %w", err)
 	}
-	if passed := runner.RunTests(evaluator, tests, verbose, filter, output.PrintTestContext, output.PrintResultTree); !passed {
+	if passed := runner.RunTests(evaluator, tests, verbose, filter); !passed {
 		os.Exit(1)
 	}
 	return nil

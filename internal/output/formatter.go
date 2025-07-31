@@ -80,3 +80,30 @@ func sortResults(results []*common.Result) []*common.Result {
 	})
 	return sorted
 }
+
+// PrintAssertionResult prints the assertion result with proper formatting
+func PrintAssertionResult(assertionResult models.AssertionResult, verbosity int) {
+	// Print evaluation status
+	log.Printf("  - Evaluation status:\n")
+	log.Printf("      - Expected: %v\n", assertionResult.ExpectedStatus)
+	log.Printf("      - Actual: %v\n", assertionResult.ActualStatus)
+
+	if verbosity >= 2 {
+		printRuleSection("Approved", assertionResult.ExpectedApproved, assertionResult.ActualApproved)
+		printRuleSection("Pending", assertionResult.ExpectedPending, assertionResult.ActualPending)
+		printRuleSection("Skipped", assertionResult.ExpectedSkipped, assertionResult.ActualSkipped)
+	}
+}
+
+// printRuleSection prints a section of rules with expected and actual lists
+func printRuleSection(sectionName string, expected, actual []string) {
+	log.Printf("  - %s Rules:\n", sectionName)
+	log.Printf("      Expected:\n")
+	for _, rule := range expected {
+		log.Printf("        - %s\n", rule)
+	}
+	log.Printf("      Actual:\n")
+	for _, rule := range actual {
+		log.Printf("        - %s\n", rule)
+	}
+}

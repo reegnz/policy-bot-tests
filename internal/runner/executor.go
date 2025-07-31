@@ -4,24 +4,16 @@ import (
 	"context"
 	"log"
 	"maps"
-	"reflect"
 	"regexp"
-	"slices"
-	"strings"
 
 	"github.com/palantir/policy-bot/policy/common"
 	"github.com/palantir/policy-bot/pull"
 	"github.com/reegnz/policy-bot-tests/internal/models"
+	"github.com/reegnz/policy-bot-tests/internal/output"
 )
 
-// PrintTestContextFunc is a callback for printing test context
-type PrintTestContextFunc func(tc models.TestContext, indent string)
-
-// PrintResultTreeFunc is a callback for printing result trees
-type PrintResultTreeFunc func(result *common.Result, indent string, showSkipped bool)
-
 // RunTests executes test cases against a policy evaluator
-func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int, filter string, printTestContext PrintTestContextFunc, printResultTree PrintResultTreeFunc) (passed bool) {
+func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int, filter string) (passed bool) {
 	var filterRegex *regexp.Regexp
 	var err error
 	if filter != "" {
@@ -56,14 +48,18 @@ func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int,
 		pullContext := NewPullContext(mergedContext)
 		result := evaluator.Evaluate(context.Background(), pullContext)
 
-		pass := CheckAssertions(tc.Assert, &result)
+		assertionResult := CheckAssertions(tc.Assert, &result)
+		pass := assertionResult.Success()
 		if !pass || verbosity >= 1 {
 			if verbosity >= 3 {
 				log.Println("  - Test Context:")
-				printTestContext(mergedContext, "    ")
+				output.PrintTestContext(mergedContext, "    ")
+			}
+			if !pass || verbosity >= 1 {
+				output.PrintAssertionResult(assertionResult, verbosity)
 			}
 			log.Println("  - Policy Evaluation Tree:")
-			printResultTree(&result, "    ", verbosity >= 2)
+			output.PrintResultTree(&result, "    ", verbosity >= 3)
 		}
 
 		if pass {
@@ -79,31 +75,10 @@ func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int,
 }
 
 // CheckAssertions validates test assertions against evaluation results
-func CheckAssertions(assert models.TestAssertion, result *common.Result) (isSuccess bool) {
-	// Check overall status
-	if result.Status.String() != assert.EvaluationStatus {
-		log.Printf("  - Expected evaluation status '%s', but got '%s'\n", assert.EvaluationStatus, result.Status)
-		return
-	}
+func CheckAssertions(assert models.TestAssertion, result *common.Result) models.AssertionResult {
 	// Check approved and pending rules
-	approved, pending, _ := collectRuleStatuses(result)
-	slices.Sort(approved)
-	slices.Sort(assert.ApprovedRules)
-	if !reflect.DeepEqual(approved, assert.ApprovedRules) {
-		log.Printf("  - Approved Rules do not match:\n")
-		log.Printf("      Expected: %v\n", strings.Join(assert.ApprovedRules, ", "))
-		log.Printf("      Actual:   %v\n", strings.Join(approved, ", "))
-		return
-	}
-	slices.Sort(pending)
-	slices.Sort(assert.PendingRules)
-	if !reflect.DeepEqual(pending, assert.PendingRules) {
-		log.Printf("  - Pending Rules do not match:\n")
-		log.Printf("      Expected: %v\n", strings.Join(assert.PendingRules, ", "))
-		log.Printf("      Actual:   %v\n", strings.Join(pending, ", "))
-		return
-	}
-	return true
+	approved, pending, skipped := collectRuleStatuses(result)
+	return models.NewAssertionResult(assert, result.Status.String(), approved, pending, skipped)
 }
 
 // collectRuleStatuses recursively collects rule statuses from evaluation results
