@@ -8,66 +8,45 @@ Given this [.policy.yml](./tests/.policy.yml) and this [.policy-tests.yml](./tes
 you'll get the following test output:
 
 ```sh
-❯ policy-bot-tests -vvv
+❯ go run . tests -v
 Running 4 of 4 total test case(s)
---- Running Test: Pass policy when team alpha files change and team alpha approves ---
-  - Test Context:
-    - Author: alpha-alice
-    - Changed Files:
-      - team-alpha/file.txt
-    - Reviews:
-      - alpha-bob (approved)
+--- Running Test: .policy-tests.yml:18: Pass policy when team alpha files change and team alpha approves ---
+  - Evaluation status:
+      - Expected: approved
+      - Actual: approved
   - Policy Evaluation Tree:
     - ✅ policy: All rules are approved
       - ✅ approval: All rules are approved
         - ✅ team-alpha-review: Approved by alpha-bob
-        - 💤 team-beta-review: No changed files match the required patterns
-      - 💤 disapproval: No disapproval policy is specified or the policy is empty
 PASS
---- Running Test: Fail policy when team alpha files change and only PR author approves ---
-  - Test Context:
-    - Author: alpha-alice
-    - Changed Files:
-      - team-alpha/file.txt
-    - Reviews:
-      - alpha-alice (approved)
+--- Running Test: .policy-tests.yml:32: Fail policy when team alpha files change and only PR author approves ---
+  - Evaluation status:
+      - Expected: pending
+      - Actual: pending
   - Policy Evaluation Tree:
     - 🟡 policy: 0/1 rules approved
       - 🟡 approval: 0/1 rules approved
         - 🟡 team-alpha-review: 0/1 required approvals. Ignored 1 approval from disqualified users
-        - 💤 team-beta-review: No changed files match the required patterns
-      - 💤 disapproval: No disapproval policy is specified or the policy is empty
 PASS
---- Running Test: Pass policy when multiple team files are changing with multiple team approvals ---
-  - Test Context:
-    - Author: alpha-alice
-    - Changed Files:
-      - team-alpha/file.txt
-      - team-beta/file.txt
-    - Reviews:
-      - alpha-bob (approved)
-      - beta-charlie (approved)
+--- Running Test: .policy-tests.yml:46: Pass policy when multiple team files are changing with multiple team approvals ---
+  - Evaluation status:
+      - Expected: approved
+      - Actual: approved
   - Policy Evaluation Tree:
     - ✅ policy: All rules are approved
       - ✅ approval: All rules are approved
         - ✅ team-alpha-review: Approved by alpha-bob
         - ✅ team-beta-review: Approved by beta-charlie
-      - 💤 disapproval: No disapproval policy is specified or the policy is empty
 PASS
---- Running Test: Fail policy when multiple team files are changing with review missing from beta team ---
-  - Test Context:
-    - Author: alpha-alice
-    - Changed Files:
-      - team-alpha/file.txt
-      - team-beta/file.txt
-    - Reviews:
-      - alpha-bob (approved)
+--- Running Test: .policy-tests.yml:65: Fail policy when multiple team files are changing with review missing from beta team ---
+  - Evaluation status:
+      - Expected: pending
+      - Actual: pending
   - Policy Evaluation Tree:
     - 🟡 policy: 1/2 rules approved
       - 🟡 approval: 1/2 rules approved
         - ✅ team-alpha-review: Approved by alpha-bob
         - 🟡 team-beta-review: 0/1 required approvals. Ignored 1 approval from disqualified users
-      - 💤 disapproval: No disapproval policy is specified or the policy is empty
 PASS
 
 --- Summary ---
