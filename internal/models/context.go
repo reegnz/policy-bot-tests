@@ -220,7 +220,7 @@ func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File
 		files:         files,
 		reviews:       reviews,
 		collaborators: collaborators,
-		labels:        tc.Tags,
+		labels:        tc.Labels,
 		statuses:      tc.Statuses,
 		workflowRuns:  tc.WorkflowRuns,
 	}
