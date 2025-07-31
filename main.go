@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"maps"
@@ -16,6 +15,7 @@ import (
 	"github.com/palantir/policy-bot/policy"
 	"github.com/palantir/policy-bot/policy/common"
 	"github.com/palantir/policy-bot/pull"
+	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
 
@@ -27,38 +27,42 @@ var (
 )
 
 var (
-	verbose          bool
-	filter           string
-	showSkippedRules bool
+	verbose int
+	filter  string
 )
 
-func init() {
-	log.SetFlags(0)
-	flag.BoolVar(&verbose, "verbose", false, "print detailed evaluation trees for all tests")
-	flag.BoolVar(&verbose, "v", false, "print detailed evaluation trees for all tests (shorthand)")
-	flag.StringVar(&filter, "filter", "", "filter tests by name using a regex")
-	flag.StringVar(&filter, "f", "", "filter tests by name using a regex (shorthand)")
-	flag.BoolVar(&showSkippedRules, "show-skipped-rules", false, "show skipped rules in the evaluation tree")
-}
-
 func main() {
-	flag.Parse()
-	if len(os.Args) > 1 && os.Args[1] == "--version" {
-		fmt.Printf("policy-bot-tests version %s (commit: %s, built: %s)\n", version, commit, date)
-		return
+	log.SetFlags(0)
+	rootCmd := &cobra.Command{
+		Use:   "policy-bot-tests",
+		Short: "Run tests for policy-bot configurations",
+		Long:  "A testing tool for policy-bot configurations that loads test cases and evaluates them against a policy file.",
+		RunE:  runMain,
 	}
 
+	// Add flags
+	rootCmd.PersistentFlags().CountVarP(&verbose, "verbose", "v", "increase verbosity (can be repeated: -v, -vv, -vvv)")
+	rootCmd.PersistentFlags().StringVarP(&filter, "filter", "f", "", "filter test cases by name using regex")
+	rootCmd.Version = fmt.Sprintf("%s (commit: %s, built: %s)", version, commit, date)
+
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func runMain(cmd *cobra.Command, args []string) error {
 	evaluator, err := loadPolicyEvaluator(".policy.yml")
 	if err != nil {
-		log.Fatalf("Failed to load evaluator: %v", err)
+		return fmt.Errorf("failed to load evaluator: %w", err)
 	}
 	tests, err := loadTestFile(".policy-tests.yml")
 	if err != nil {
-		log.Fatalf("Failed to load tests: %v", err)
+		return fmt.Errorf("failed to load tests: %w", err)
 	}
 	if passed := runTests(evaluator, tests); !passed {
 		os.Exit(1)
 	}
+	return nil
 }
 
 func loadPolicyEvaluator(fileName string) (common.Evaluator, error) {
@@ -121,9 +125,13 @@ func runTests(evaluator common.Evaluator, tests *TestFile) (passed bool) {
 		result := evaluator.Evaluate(context.Background(), pullContext)
 
 		pass := checkAssertions(tc.Assert, &result)
-		if !pass || verbose {
-			log.Println("  - Evaluation Tree:")
-			printResultTree(&result, "    ")
+		if !pass || verbose >= 1 {
+			if verbose >= 3 {
+				log.Println("  - Test Context:")
+				printTestContext(mergedContext, "    ")
+			}
+			log.Println("  - Policy Evaluation Tree:")
+			printResultTree(&result, "    ", verbose >= 2)
 		}
 
 		if pass {
@@ -189,7 +197,41 @@ func collectRuleStatuses(result *common.Result) (approved, pending, skipped []st
 	return nil, nil, nil
 }
 
-func printResultTree(result *common.Result, indent string) {
+func printTestContext(tc TestContext, indent string) {
+	log.Printf("%s- Author: %s", indent, tc.PR.Author)
+	if len(tc.FilesChanged) > 0 {
+		log.Printf("%s- Changed Files:", indent)
+		for _, file := range tc.FilesChanged {
+			log.Printf("%s  - %s", indent, file)
+		}
+	}
+	if len(tc.Reviews) > 0 {
+		log.Printf("%s- Reviews:", indent)
+		for _, r := range tc.Reviews {
+			log.Printf("%s  - %s (%s)", indent, r.Author, r.State)
+		}
+	}
+	if len(tc.Tags) > 0 {
+		log.Printf("%s- Labels:", indent)
+		for _, tag := range tc.Tags {
+			log.Printf("%s  - %s", indent, tag)
+		}
+	}
+	if len(tc.Statuses) > 0 {
+		log.Printf("%s- Statuses:", indent)
+		for k, v := range tc.Statuses {
+			log.Printf("%s  - %s: %s", indent, k, v)
+		}
+	}
+	if len(tc.WorkflowRuns) > 0 {
+		log.Printf("%s- Workflows:", indent)
+		for k, v := range tc.WorkflowRuns {
+			log.Printf("%s  - %s: %s", indent, k, strings.Join(v, ", "))
+		}
+	}
+}
+
+func printResultTree(result *common.Result, indent string, showSkipped bool) {
 	statusIcon := "⚪"
 	switch result.Status {
 	case common.StatusApproved:
@@ -211,10 +253,10 @@ func printResultTree(result *common.Result, indent string) {
 	})
 
 	for _, child := range sortedChildren {
-		if child.Status == common.StatusSkipped && !showSkippedRules {
+		if child.Status == common.StatusSkipped && !showSkipped {
 			continue
 		}
-		printResultTree(child, indent+"  ")
+		printResultTree(child, indent+"  ", showSkipped)
 	}
 }
 
