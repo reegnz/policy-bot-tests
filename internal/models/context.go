@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"slices"
@@ -13,6 +13,7 @@ var (
 	_ pull.MembershipContext = &GitHubMembershipContext{}
 )
 
+// GitHubMembershipContext handles team and organization membership queries
 type GitHubMembershipContext struct {
 	orgMembers  map[string][]string
 	teamMembers map[string][]string
@@ -53,6 +54,7 @@ func (mc *GitHubMembershipContext) OrganizationMembers(org string) ([]string, er
 	return mc.orgMembers[strings.ToLower(org)], nil
 }
 
+// GitHubContext implements the pull.Context interface for policy evaluation
 type GitHubContext struct {
 	GitHubMembershipContext
 
@@ -75,6 +77,7 @@ type GitHubContext struct {
 	workflowRuns map[string][]string
 }
 
+// PullRequest represents a GitHub pull request
 type PullRequest struct {
 	author    string
 	title     string
@@ -91,6 +94,7 @@ type PullRequest struct {
 	body pull.Body
 }
 
+// GitHubContext interface implementations
 func (ghc *GitHubContext) EvaluationTimestamp() time.Time {
 	return ghc.evalTimestamp
 }
@@ -201,49 +205,23 @@ func (ghc *GitHubContext) PushedAt(sha string) (time.Time, error) {
 	return ghc.pushedAt[sha], nil
 }
 
-// TestFile matches the root of the .policy-tests.yml file
-type TestFile struct {
-	DefaultContext TestContext `yaml:"defaultContext"`
-	TestCases      []TestCase  `yaml:"testCases"`
-}
-
-// TestCase represents a single test case from the YAML file
-type TestCase struct {
-	Name    string        `yaml:"name"`
-	Context TestContext   `yaml:"context"`
-	Assert  TestAssertion `yaml:"assert"`
-}
-
-// TestContext is a simplified version of GitHubContext for easy YAML parsing
-type TestContext struct {
-	FilesChanged []string            `yaml:"filesChanged"`
-	Owner        string              `yaml:"owner"`
-	Repo         string              `yaml:"repo"`
-	PR           TestPullRequest     `yaml:"pr"`
-	Reviews      []TestReview        `yaml:"reviews"`
-	Statuses     map[string]string   `yaml:"statuses"`
-	WorkflowRuns map[string][]string `yaml:"workflowRuns"`
-	Tags         []string            `yaml:"tags"`
-	TeamMembers  map[string][]string `yaml:"teamMembers"`
-	OrgMembers   map[string][]string `yaml:"orgMembers"`
-}
-
-// TestPullRequest is a simplified version of a PR for YAML parsing
-type TestPullRequest struct {
-	Author      string `yaml:"author"`
-	BaseRefName string `yaml:"baseRefName"`
-	HeadRefName string `yaml:"headRefName"`
-}
-
-// TestReview is a simplified version of a review for YAML parsing
-type TestReview struct {
-	Author string `yaml:"author"`
-	State  string `yaml:"state"`
-}
-
-// TestAssertion defines the expected outcomes of a test case
-type TestAssertion struct {
-	EvaluationStatus string   `yaml:"evaluationStatus"`
-	ApprovedRules    []string `yaml:"approvedRules"`
-	PendingRules     []string `yaml:"pendingRules"`
+// NewGitHubContext creates a new GitHubContext from test context data
+func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File, collaborators []*pull.Collaborator) *GitHubContext {
+	return &GitHubContext{
+		GitHubMembershipContext: *NewGitHubMembershipContext(tc.TeamMembers, tc.OrgMembers),
+		evalTimestamp:           time.Now(),
+		owner:                   tc.Owner,
+		repo:                    tc.Repo,
+		pr: PullRequest{
+			author:      tc.PR.Author,
+			baseRefName: tc.PR.BaseRefName,
+			headRefName: tc.PR.HeadRefName,
+		},
+		files:         files,
+		reviews:       reviews,
+		collaborators: collaborators,
+		labels:        tc.Tags,
+		statuses:      tc.Statuses,
+		workflowRuns:  tc.WorkflowRuns,
+	}
 }
