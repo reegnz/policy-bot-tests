@@ -35,7 +35,7 @@ func NewRootCommand() *cobra.Command {
 	// Add flags
 	rootCmd.PersistentFlags().CountVarP(&verbose, "verbose", "v", "increase verbosity (can be repeated: -v, -vv, -vvv)")
 	rootCmd.PersistentFlags().StringVarP(&filter, "filter", "f", "", "filter test cases by name using regex")
-	rootCmd.Version = fmt.Sprintf("%s (commit: %s, built: %s)", Version, Commit, Date)
+	rootCmd.Version = fmt.Sprintf("%s (commit: %s, date: %s)", Version, Commit, Date)
 
 	return rootCmd
 }
