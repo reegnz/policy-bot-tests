@@ -8,10 +8,16 @@ Given this [.policy.yml](./tests/.policy.yml) and this [.policy-tests.yml](./tes
 you'll get the following test output:
 
 ```sh
-❯ policy-bot-tests
-Found 4 test case(s)
+❯ policy-bot-tests -vvv
+Running 4 of 4 total test case(s)
 --- Running Test: Pass policy when team alpha files change and team alpha approves ---
-  - Evaluation Tree:
+  - Test Context:
+    - Author: alpha-alice
+    - Changed Files:
+      - team-alpha/file.txt
+    - Reviews:
+      - alpha-bob (approved)
+  - Policy Evaluation Tree:
     - ✅ policy: All rules are approved
       - ✅ approval: All rules are approved
         - ✅ team-alpha-review: Approved by alpha-bob
@@ -19,7 +25,13 @@ Found 4 test case(s)
       - 💤 disapproval: No disapproval policy is specified or the policy is empty
 PASS
 --- Running Test: Fail policy when team alpha files change and only PR author approves ---
-  - Evaluation Tree:
+  - Test Context:
+    - Author: alpha-alice
+    - Changed Files:
+      - team-alpha/file.txt
+    - Reviews:
+      - alpha-alice (approved)
+  - Policy Evaluation Tree:
     - 🟡 policy: 0/1 rules approved
       - 🟡 approval: 0/1 rules approved
         - 🟡 team-alpha-review: 0/1 required approvals. Ignored 1 approval from disqualified users
@@ -27,7 +39,15 @@ PASS
       - 💤 disapproval: No disapproval policy is specified or the policy is empty
 PASS
 --- Running Test: Pass policy when multiple team files are changing with multiple team approvals ---
-  - Evaluation Tree:
+  - Test Context:
+    - Author: alpha-alice
+    - Changed Files:
+      - team-alpha/file.txt
+      - team-beta/file.txt
+    - Reviews:
+      - alpha-bob (approved)
+      - beta-charlie (approved)
+  - Policy Evaluation Tree:
     - ✅ policy: All rules are approved
       - ✅ approval: All rules are approved
         - ✅ team-alpha-review: Approved by alpha-bob
@@ -35,7 +55,14 @@ PASS
       - 💤 disapproval: No disapproval policy is specified or the policy is empty
 PASS
 --- Running Test: Fail policy when multiple team files are changing with review missing from beta team ---
-  - Evaluation Tree:
+  - Test Context:
+    - Author: alpha-alice
+    - Changed Files:
+      - team-alpha/file.txt
+      - team-beta/file.txt
+    - Reviews:
+      - alpha-bob (approved)
+  - Policy Evaluation Tree:
     - 🟡 policy: 1/2 rules approved
       - 🟡 approval: 1/2 rules approved
         - ✅ team-alpha-review: Approved by alpha-bob
