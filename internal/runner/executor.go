@@ -42,7 +42,11 @@ func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int,
 	log.Printf("Running %d of %d total test case(s)\n", len(filteredCases), len(tests.TestCases))
 	passedCount := 0
 	for _, tc := range filteredCases {
-		log.Printf("--- Running Test: %s ---\n", tc.Name)
+		if tc.LineNumber > 0 {
+			log.Printf("--- Running Test: .policy-tests.yml:%d: %s ---\n", tc.LineNumber, tc.Name)
+		} else {
+			log.Printf("--- Running Test: %s ---\n", tc.Name)
+		}
 
 		mergedContext := MergeContexts(tests.DefaultContext, tc.Context)
 		pullContext := NewPullContext(mergedContext)

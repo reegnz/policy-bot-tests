@@ -10,9 +10,10 @@ type TestFile struct {
 
 // TestCase represents a single test case from the YAML file
 type TestCase struct {
-	Name    string        `yaml:"name"`
-	Context TestContext   `yaml:"context"`
-	Assert  TestAssertion `yaml:"assert"`
+	Name       string        `yaml:"name"`
+	Context    TestContext   `yaml:"context"`
+	Assert     TestAssertion `yaml:"assert"`
+	LineNumber int           `yaml:"-"`
 }
 
 // TestContext is a simplified version of GitHubContext for easy YAML parsing
