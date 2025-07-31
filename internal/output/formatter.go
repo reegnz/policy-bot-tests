@@ -24,10 +24,10 @@ func PrintTestContext(tc models.TestContext, indent string) {
 			log.Printf("%s  - %s (%s)", indent, r.Author, r.State)
 		}
 	}
-	if len(tc.Tags) > 0 {
+	if len(tc.Labels) > 0 {
 		log.Printf("%s- Labels:", indent)
-		for _, tag := range tc.Tags {
-			log.Printf("%s  - %s", indent, tag)
+		for _, label := range tc.Labels {
+			log.Printf("%s  - %s", indent, label)
 		}
 	}
 	if len(tc.Statuses) > 0 {

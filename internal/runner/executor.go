@@ -142,8 +142,8 @@ func MergeContexts(base, override models.TestContext) models.TestContext {
 	if len(override.WorkflowRuns) > 0 {
 		merged.WorkflowRuns = override.WorkflowRuns
 	}
-	if len(override.Tags) > 0 {
-		merged.Tags = override.Tags
+	if len(override.Labels) > 0 {
+		merged.Labels = override.Labels
 	}
 	if len(override.TeamMembers) > 0 {
 		maps.Copy(merged.TeamMembers, override.TeamMembers)

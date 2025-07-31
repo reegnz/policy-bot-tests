@@ -25,7 +25,7 @@ type TestContext struct {
 	Reviews      []TestReview        `yaml:"reviews"`
 	Statuses     map[string]string   `yaml:"statuses"`
 	WorkflowRuns map[string][]string `yaml:"workflowRuns"`
-	Tags         []string            `yaml:"tags"`
+	Labels       []string            `yaml:"labels"`
 	TeamMembers  map[string][]string `yaml:"teamMembers"`
 	OrgMembers   map[string][]string `yaml:"orgMembers"`
 }
