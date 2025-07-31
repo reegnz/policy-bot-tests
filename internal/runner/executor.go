@@ -13,7 +13,7 @@ import (
 )
 
 // RunTests executes test cases against a policy evaluator
-func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int, filter string) (passed bool) {
+func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int, filter string, outputFormat string) (passed bool) {
 	var filterRegex *regexp.Regexp
 	var err error
 	if filter != "" {
@@ -39,41 +39,50 @@ func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int,
 		return true
 	}
 
-	log.Printf("Running %d of %d total test case(s)\n", len(filteredCases), len(tests.TestCases))
+	if outputFormat == "pretty" {
+		log.Printf("Running %d of %d total test case(s)", len(filteredCases), len(tests.TestCases))
+	}
 	passedCount := 0
 	for _, tc := range filteredCases {
-		if tc.LineNumber > 0 {
-			log.Printf("--- Running Test: .policy-tests.yml:%d: %s ---\n", tc.LineNumber, tc.Name)
-		} else {
-			log.Printf("--- Running Test: %s ---\n", tc.Name)
-		}
-
 		mergedContext := MergeContexts(tests.DefaultContext, tc.Context)
 		pullContext := NewPullContext(mergedContext)
 		result := evaluator.Evaluate(context.Background(), pullContext)
 
 		assertionResult := CheckAssertions(tc.Assert, &result)
 		pass := assertionResult.Success()
-		if !pass || verbosity >= 1 {
-			if verbosity >= 3 {
-				log.Println("  - Test Context:")
-				output.PrintTestContext(mergedContext, "    ")
+
+		switch outputFormat {
+		case "efm":
+			if !pass {
+				log.Printf(".policy-tests.yml:%d:1: %s", tc.LineNumber, tc.Name)
 			}
+		case "pretty":
+			if pass {
+				log.Printf("✅ PASS: %s", tc.Name)
+			} else {
+				log.Printf("❌ FAIL: %s", tc.Name)
+			}
+
 			if !pass || verbosity >= 1 {
-				output.PrintAssertionResult(assertionResult, verbosity)
+				if verbosity >= 3 {
+					log.Println("  - Test Context:")
+					output.PrintTestContext(mergedContext, "    ")
+				}
+				if !pass || verbosity >= 1 {
+					output.PrintAssertionResult(assertionResult, verbosity)
+				}
+				log.Println("  - Policy Evaluation Tree:")
+				output.PrintResultTree(&result, "    ", verbosity >= 3)
 			}
-			log.Println("  - Policy Evaluation Tree:")
-			output.PrintResultTree(&result, "    ", verbosity >= 3)
 		}
 
 		if pass {
 			passedCount++
-			log.Println("\033[32mPASS\033[0m")
-		} else {
-			log.Println("\033[31mFAIL\033[0m")
 		}
 	}
-	log.Printf("\n--- Summary ---\n%d / %d tests passed.\n", passedCount, len(filteredCases))
+	if outputFormat == "pretty" {
+		log.Printf("\nSummary: %d / %d tests passed.", passedCount, len(filteredCases))
+	}
 	passed = passedCount == len(filteredCases)
 	return
 }

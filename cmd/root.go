@@ -19,8 +19,9 @@ var (
 )
 
 var (
-	verbose int
-	filter  string
+	verbose      int
+	filter       string
+	outputFormat string
 )
 
 // NewRootCommand creates the root command for the CLI
@@ -36,6 +37,7 @@ func NewRootCommand() *cobra.Command {
 	// Add flags
 	rootCmd.PersistentFlags().CountVarP(&verbose, "verbose", "v", "increase verbosity (can be repeated: -v, -vv, -vvv)")
 	rootCmd.PersistentFlags().StringVarP(&filter, "filter", "f", "", "filter test cases by name using regex")
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "pretty", "output format (pretty, efm)")
 	rootCmd.Version = fmt.Sprintf("%s (commit: %s, date: %s)", Version, Commit, Date)
 
 	return rootCmd
@@ -44,6 +46,7 @@ func NewRootCommand() *cobra.Command {
 // Execute runs the root command
 func Execute() {
 	log.SetFlags(0)
+	log.SetOutput(os.Stdout)
 
 	if err := NewRootCommand().Execute(); err != nil {
 		os.Exit(1)
@@ -68,7 +71,7 @@ func runMain(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to load tests: %w", err)
 	}
-	if passed := runner.RunTests(evaluator, tests, verbose, filter); !passed {
+	if passed := runner.RunTests(evaluator, tests, verbose, filter, outputFormat); !passed {
 		os.Exit(1)
 	}
 	return nil
