@@ -126,6 +126,12 @@ func MergeContexts(base, override models.TestContext) models.TestContext {
 	if len(override.FilesChanged) > 0 {
 		merged.FilesChanged = override.FilesChanged
 	}
+	if len(override.FilesAdded) > 0 {
+		merged.FilesAdded = override.FilesAdded
+	}
+	if len(override.FilesDeleted) > 0 {
+		merged.FilesDeleted = override.FilesDeleted
+	}
 	if override.Owner != "" {
 		merged.Owner = override.Owner
 	}
@@ -176,7 +182,13 @@ func NewPullContext(tc models.TestContext) pull.Context {
 
 	files := []*pull.File{}
 	for _, f := range tc.FilesChanged {
-		files = append(files, &pull.File{Filename: f})
+		files = append(files, &pull.File{Filename: f, Status: pull.FileModified})
+	}
+	for _, f := range tc.FilesAdded {
+		files = append(files, &pull.File{Filename: f, Status: pull.FileAdded})
+	}
+	for _, f := range tc.FilesDeleted {
+		files = append(files, &pull.File{Filename: f, Status: pull.FileDeleted})
 	}
 
 	collaborators := []*pull.Collaborator{}
