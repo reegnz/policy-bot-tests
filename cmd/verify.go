@@ -3,50 +3,53 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/reegnz/policy-bot-tests/internal/loader"
 	"github.com/reegnz/policy-bot-tests/internal/runner"
 	"github.com/spf13/cobra"
 )
 
+const (
+	defaultTestPath   = ".policy-tests"
+	defaultPolicyFile = ".policy.yml"
+	defaultOutput     = "pretty"
+)
+
 var (
 	verifyVerbose      int
 	verifyFilter       string
 	verifyOutputFormat string
+	verifyPolicyFile   string
 )
 
 // NewVerifyCommand creates the "verify" subcommand
 func NewVerifyCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "verify [directory]",
+		Use:   "verify [paths...]",
 		Short: "Verifies test cases against a policy file",
 		Long:  "Verifies test cases against a policy file by loading test cases and evaluating them.",
-		Args:  cobra.MaximumNArgs(1),
 		RunE:  runVerify,
 	}
 
 	cmd.Flags().CountVarP(&verifyVerbose, "verbose", "v", "increase verbosity (can be repeated: -v, -vv, -vvv)")
 	cmd.Flags().StringVarP(&verifyFilter, "filter", "f", "", "filter test cases by name using regex")
-	cmd.Flags().StringVarP(&verifyOutputFormat, "output", "o", "pretty", "output format (pretty, efm)")
+	cmd.Flags().StringVarP(&verifyOutputFormat, "output", "o", defaultOutput, "output format (pretty, efm)")
+	cmd.Flags().StringVarP(&verifyPolicyFile, "policy", "p", defaultPolicyFile, "path to the policy file")
 
 	return cmd
 }
 
 func runVerify(cmd *cobra.Command, args []string) error {
-	directory := "."
-	if len(args) > 0 {
-		directory = args[0]
-	}
-
-	policyFile := filepath.Join(directory, ".policy.yml")
-	testFile := filepath.Join(directory, ".policy-tests.yml")
-
-	evaluator, err := loader.LoadPolicyEvaluator(policyFile)
+	evaluator, err := loader.LoadPolicyEvaluator(verifyPolicyFile)
 	if err != nil {
 		return fmt.Errorf("failed to load evaluator: %w", err)
 	}
-	tests, err := loader.LoadTestFile(testFile)
+
+	if len(args) == 0 {
+		args = []string{defaultTestPath}
+	}
+
+	tests, err := loader.LoadTestFiles(args)
 	if err != nil {
 		return fmt.Errorf("failed to load tests: %w", err)
 	}
