@@ -19,6 +19,8 @@ type TestCase struct {
 // TestContext is a simplified version of GitHubContext for easy YAML parsing
 type TestContext struct {
 	FilesChanged []string            `yaml:"files_changed"`
+	FilesAdded   []string            `yaml:"files_added"`
+	FilesDeleted []string            `yaml:"files_deleted"`
 	Author       string              `yaml:"author"`
 	Owner        string              `yaml:"owner"`
 	Repo         string              `yaml:"repo"`
