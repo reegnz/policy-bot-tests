@@ -51,3 +51,16 @@ release:
 
     ### Manual Installation
     Download the appropriate binary for your platform from the assets above.
+
+homebrew_casks:
+- repository:
+    owner: reegnz
+    name: policy-bot-tests
+  hooks:
+    post:
+      # replace foo with the actual binary name
+      install: |
+        if system_command("/usr/bin/xattr", args: ["-h"]).exit_status == 0
+          system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/policy-bot-tests"]
+        end
+
