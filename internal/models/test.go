@@ -19,6 +19,7 @@ type TestCase struct {
 // TestContext is a simplified version of GitHubContext for easy YAML parsing
 type TestContext struct {
 	FilesChanged []string            `yaml:"files_changed"`
+	Author       string              `yaml:"author"`
 	Owner        string              `yaml:"owner"`
 	Repo         string              `yaml:"repo"`
 	PR           TestPullRequest     `yaml:"pr"`
@@ -32,7 +33,6 @@ type TestContext struct {
 
 // TestPullRequest is a simplified version of a PR for YAML parsing
 type TestPullRequest struct {
-	Author      string `yaml:"author"`
 	BaseRefName string `yaml:"base_ref_name"`
 	HeadRefName string `yaml:"head_ref_name"`
 }
