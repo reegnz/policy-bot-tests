@@ -1,11 +1,11 @@
 ---
-defaultContext:
+default_context:
   owner: test
   repo: test
   pr:
-    baseRefName: main
-    headRefName: feature/changes
-  teamMembers:
+    base_ref_name: main
+    head_ref_name: feature/changes
+  team_members:
     test/team-alpha:
     - alpha-alice
     - alpha-bob
@@ -14,10 +14,10 @@ defaultContext:
     - beta-alice
     - beta-bob
     - beta-charlie
-testCases:
+test_cases:
 - name: Pass policy when team alpha files change and team alpha approves
   context:
-    filesChanged:
+    files_changed:
     - team-alpha/file.txt
     pr:
       author: alpha-alice
@@ -25,13 +25,13 @@ testCases:
     - author: alpha-bob
       state: approved
   assert:
-    evaluationStatus: approved
-    mustBeApproved:
+    evaluation_status: approved
+    must_be_approved:
     - team-alpha-review
 
 - name: Fail policy when team alpha files change and only PR author approves
   context:
-    filesChanged:
+    files_changed:
     - team-alpha/file.txt
     pr:
       author: alpha-alice
@@ -39,13 +39,13 @@ testCases:
     - author: alpha-alice
       state: approved
   assert:
-    evaluationStatus: pending
-    mustBePending:
+    evaluation_status: pending
+    must_be_pending:
     - team-alpha-review
 
 - name: Pass policy when multiple team files are changing with multiple team approvals
   context:
-    filesChanged:
+    files_changed:
     - team-alpha/file.txt
     - team-beta/file.txt
     pr:
@@ -56,15 +56,15 @@ testCases:
     - author: beta-charlie
       state: approved
   assert:
-    evaluationStatus: approved
-    mustBeApproved:
+    evaluation_status: approved
+    must_be_approved:
     - team-alpha-review
     - team-beta-review
 
 
 - name: Fail policy when multiple team files are changing with review missing from beta team
   context:
-    filesChanged:
+    files_changed:
     - team-alpha/file.txt
     - team-beta/file.txt
     pr:
@@ -73,8 +73,8 @@ testCases:
     - author: alpha-bob
       state: approved
   assert:
-    evaluationStatus: pending
-    mustBeApproved:
+    evaluation_status: pending
+    must_be_approved:
     - team-alpha-review
-    mustBePending:
+    must_be_pending:
     - team-beta-review

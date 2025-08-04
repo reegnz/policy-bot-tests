@@ -4,8 +4,8 @@ import "slices"
 
 // TestFile matches the root of the .policy-tests.yml file
 type TestFile struct {
-	DefaultContext TestContext `yaml:"defaultContext"`
-	TestCases      []TestCase  `yaml:"testCases"`
+	DefaultContext TestContext `yaml:"default_context"`
+	TestCases      []TestCase  `yaml:"test_cases"`
 }
 
 // TestCase represents a single test case from the YAML file
@@ -18,23 +18,23 @@ type TestCase struct {
 
 // TestContext is a simplified version of GitHubContext for easy YAML parsing
 type TestContext struct {
-	FilesChanged []string            `yaml:"filesChanged"`
+	FilesChanged []string            `yaml:"files_changed"`
 	Owner        string              `yaml:"owner"`
 	Repo         string              `yaml:"repo"`
 	PR           TestPullRequest     `yaml:"pr"`
 	Reviews      []TestReview        `yaml:"reviews"`
 	Statuses     map[string]string   `yaml:"statuses"`
-	WorkflowRuns map[string][]string `yaml:"workflowRuns"`
+	WorkflowRuns map[string][]string `yaml:"workflow_runs"`
 	Labels       []string            `yaml:"labels"`
-	TeamMembers  map[string][]string `yaml:"teamMembers"`
-	OrgMembers   map[string][]string `yaml:"orgMembers"`
+	TeamMembers  map[string][]string `yaml:"team_members"`
+	OrgMembers   map[string][]string `yaml:"org_members"`
 }
 
 // TestPullRequest is a simplified version of a PR for YAML parsing
 type TestPullRequest struct {
 	Author      string `yaml:"author"`
-	BaseRefName string `yaml:"baseRefName"`
-	HeadRefName string `yaml:"headRefName"`
+	BaseRefName string `yaml:"base_ref_name"`
+	HeadRefName string `yaml:"head_ref_name"`
 }
 
 // TestReview is a simplified version of a review for YAML parsing
@@ -45,10 +45,10 @@ type TestReview struct {
 
 // TestAssertion defines the expected outcomes of a test case
 type TestAssertion struct {
-	EvaluationStatus string   `yaml:"evaluationStatus"`
-	MustBeApproved   []string `yaml:"mustBeApproved"`
-	MustBePending    []string `yaml:"mustBePending"`
-	MustBeSkipped    []string `yaml:"mustBeSkipped"`
+	EvaluationStatus string   `yaml:"evaluation_status"`
+	MustBeApproved   []string `yaml:"must_be_approved"`
+	MustBePending    []string `yaml:"must_be_pending"`
+	MustBeSkipped    []string `yaml:"must_be_skipped"`
 }
 
 // AssertionResult holds the results of test assertions
