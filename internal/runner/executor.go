@@ -132,8 +132,8 @@ func MergeContexts(base, override models.TestContext) models.TestContext {
 	if override.Repo != "" {
 		merged.Repo = override.Repo
 	}
-	if override.PR.Author != "" {
-		merged.PR.Author = override.PR.Author
+	if override.Author != "" {
+		merged.Author = override.Author
 	}
 	if override.PR.BaseRefName != "" {
 		merged.PR.BaseRefName = override.PR.BaseRefName

@@ -19,8 +19,7 @@ test_cases:
   context:
     files_changed:
     - team-alpha/file.txt
-    pr:
-      author: alpha-alice
+    author: alpha-alice
     reviews:
     - author: alpha-bob
       state: approved
@@ -33,8 +32,7 @@ test_cases:
   context:
     files_changed:
     - team-alpha/file.txt
-    pr:
-      author: alpha-alice
+    author: alpha-alice
     reviews:
     - author: alpha-alice
       state: approved
@@ -48,8 +46,7 @@ test_cases:
     files_changed:
     - team-alpha/file.txt
     - team-beta/file.txt
-    pr:
-      author: alpha-alice
+    author: alpha-alice
     reviews:
     - author: alpha-bob
       state: approved
@@ -67,8 +64,7 @@ test_cases:
     files_changed:
     - team-alpha/file.txt
     - team-beta/file.txt
-    pr:
-      author: alpha-alice
+    author: alpha-alice
     reviews:
     - author: alpha-bob
       state: approved

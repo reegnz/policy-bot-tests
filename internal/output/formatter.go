@@ -11,7 +11,7 @@ import (
 
 // PrintTestContext prints the test context information with proper formatting
 func PrintTestContext(tc models.TestContext, indent string) {
-	log.Printf("%s- Author: %s", indent, tc.PR.Author)
+	log.Printf("%s- Author: %s", indent, tc.Author)
 	if len(tc.FilesChanged) > 0 {
 		log.Printf("%s- Changed Files:", indent)
 		for _, file := range tc.FilesChanged {

@@ -213,7 +213,7 @@ func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File
 		owner:                   tc.Owner,
 		repo:                    tc.Repo,
 		pr: PullRequest{
-			author:      tc.PR.Author,
+			author:      tc.Author,
 			baseRefName: tc.PR.BaseRefName,
 			headRefName: tc.PR.HeadRefName,
 		},
