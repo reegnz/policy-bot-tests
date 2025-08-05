@@ -59,6 +59,17 @@ PASS
 
 Download the latest release from [GitHub Releases](https://github.com/reegnz/policy-bot-tests/releases) and extract the binary for your platform.
 
+### Homebrew Installation
+
+You can install policy-bot-tests using Homebrew:
+
+```sh
+brew tap reegnz/policy-bot-tests https://github.com/reegnz/policy-bot-tests
+brew install policy-bot-tests
+```
+
+> Note: The full GitHub URL is required in the tap command because this repository does not follow the `homebrew-<name>` naming convention expected by Homebrew.
+
 ## Development
 
 ### Building from source
