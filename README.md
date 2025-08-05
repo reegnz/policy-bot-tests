@@ -8,9 +8,9 @@ Given this [.policy.yml](./tests/.policy.yml) and this [.policy-tests.yml](./tes
 you'll get the following test output:
 
 ```sh
-❯ go run . tests -v
+❯ go run . verify -p tests/.policy.yml tests -v
 Running 4 of 4 total test case(s)
---- Running Test: .policy-tests.yml:18: Pass policy when team alpha files change and team alpha approves ---
+✅ PASS: Pass policy when team alpha files change and team alpha approves
   - Evaluation status:
       - Expected: approved
       - Actual: approved
@@ -18,8 +18,7 @@ Running 4 of 4 total test case(s)
     - ✅ policy: All rules are approved
       - ✅ approval: All rules are approved
         - ✅ team-alpha-review: Approved by alpha-bob
-PASS
---- Running Test: .policy-tests.yml:32: Fail policy when team alpha files change and only PR author approves ---
+✅ PASS: Fail policy when team alpha files change and only PR author approves
   - Evaluation status:
       - Expected: pending
       - Actual: pending
@@ -27,8 +26,7 @@ PASS
     - 🟡 policy: 0/1 rules approved
       - 🟡 approval: 0/1 rules approved
         - 🟡 team-alpha-review: 0/1 required approvals. Ignored 1 approval from disqualified users
-PASS
---- Running Test: .policy-tests.yml:46: Pass policy when multiple team files are changing with multiple team approvals ---
+✅ PASS: Pass policy when multiple team files are changing with multiple team approvals
   - Evaluation status:
       - Expected: approved
       - Actual: approved
@@ -37,8 +35,7 @@ PASS
       - ✅ approval: All rules are approved
         - ✅ team-alpha-review: Approved by alpha-bob
         - ✅ team-beta-review: Approved by beta-charlie
-PASS
---- Running Test: .policy-tests.yml:65: Fail policy when multiple team files are changing with review missing from beta team ---
+✅ PASS: Fail policy when multiple team files are changing with review missing from beta team
   - Evaluation status:
       - Expected: pending
       - Actual: pending
@@ -47,10 +44,8 @@ PASS
       - 🟡 approval: 1/2 rules approved
         - ✅ team-alpha-review: Approved by alpha-bob
         - 🟡 team-beta-review: 0/1 required approvals. Ignored 1 approval from disqualified users
-PASS
 
---- Summary ---
-4 / 4 tests passed.
+Summary: 4 / 4 tests passed.
 ```
 
 ## Installation
