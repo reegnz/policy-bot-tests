@@ -54,7 +54,7 @@ func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int,
 		switch outputFormat {
 		case "efm":
 			if !pass {
-				log.Printf(".policy-tests.yml:%d:1: %s", tc.LineNumber, tc.Name)
+				log.Printf("%s:%d:1: %s", tc.FileName, tc.LineNumber, tc.Name)
 			}
 		case "pretty":
 			if pass {

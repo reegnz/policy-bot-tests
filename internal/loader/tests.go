@@ -66,6 +66,18 @@ func LoadTestFiles(paths []string) (*models.TestFile, error) {
 
 		extractLineNumbers(&node, &tests)
 
+		// Set filename for all test cases from this file
+		for i := range tests.TestCases {
+			// Get relative path from current working directory
+			relPath, err := filepath.Rel(".", file)
+			if err != nil {
+				// Fallback to base filename if relative path fails
+				tests.TestCases[i].FileName = filepath.Base(file)
+			} else {
+				tests.TestCases[i].FileName = relPath
+			}
+		}
+
 		// Simple merge: append test cases, last defaultContext wins.
 		mergedTests.TestCases = append(mergedTests.TestCases, tests.TestCases...)
 		if tests.DefaultContext.Owner != "" {
@@ -87,7 +99,7 @@ func extractLineNumbers(node *yaml.Node, tests *models.TestFile) {
 			key := node.Content[i]
 			value := node.Content[i+1]
 
-			if key.Value == "testCases" && value.Kind == yaml.SequenceNode {
+			if key.Value == "test_cases" && value.Kind == yaml.SequenceNode {
 				for j, testNode := range value.Content {
 					if j < len(tests.TestCases) {
 						tests.TestCases[j].LineNumber = testNode.Line
