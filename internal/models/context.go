@@ -198,7 +198,12 @@ func (ghc *GitHubContext) LatestWorkflowRuns() (map[string][]string, error) {
 }
 
 func (ghc *GitHubContext) Labels() ([]string, error) {
-	return ghc.labels, nil
+	// Convert labels to lowercase to match the real GitHub context behavior
+	lowercaseLabels := make([]string, len(ghc.labels))
+	for i, label := range ghc.labels {
+		lowercaseLabels[i] = strings.ToLower(label)
+	}
+	return lowercaseLabels, nil
 }
 
 func (ghc *GitHubContext) PushedAt(sha string) (time.Time, error) {
