@@ -82,28 +82,30 @@ func sortResults(results []*common.Result) []*common.Result {
 }
 
 // PrintAssertionResult prints the assertion result with proper formatting
-func PrintAssertionResult(assertionResult models.AssertionResult, verbosity int) {
+func PrintAssertionResult(assertionResult models.AssertionResult, verbosity int, indent string) {
 	// Print evaluation status
-	log.Printf("  - Evaluation status:\n")
-	log.Printf("      - Expected: %v\n", assertionResult.ExpectedStatus)
-	log.Printf("      - Actual: %v\n", assertionResult.ActualStatus)
+	log.Printf("%s- Evaluation status:\n", indent)
+	log.Printf("%s  - Expected: %v\n", indent, assertionResult.ExpectedStatus)
+	log.Printf("%s  - Actual: %v\n", indent, assertionResult.ActualStatus)
 
-	if verbosity >= 2 {
-		printRuleSection("Approved", assertionResult.ExpectedApproved, assertionResult.ActualApproved)
-		printRuleSection("Pending", assertionResult.ExpectedPending, assertionResult.ActualPending)
-		printRuleSection("Skipped", assertionResult.ExpectedSkipped, assertionResult.ActualSkipped)
+	// Show failing assertions or all if verbosity >= 2
+	if verbosity >= 1 || !assertionResult.Success() {
+		if verbosity >= 3 || assertionResult.HasMissingApproved() {
+			printRuleSection("approved", assertionResult.MissingApproved(), indent)
+		}
+		if verbosity >= 3 || assertionResult.HasMissingPending() {
+			printRuleSection("pending", assertionResult.MissingPending(), indent)
+		}
+		if verbosity >= 3 || assertionResult.HasMissingSkipped() {
+			printRuleSection("skipped", assertionResult.MissingSkipped(), indent)
+		}
 	}
 }
 
 // printRuleSection prints a section of rules with expected and actual lists
-func printRuleSection(sectionName string, expected, actual []string) {
-	log.Printf("  - %s Rules:\n", sectionName)
-	log.Printf("      Expected:\n")
-	for _, rule := range expected {
-		log.Printf("        - %s\n", rule)
-	}
-	log.Printf("      Actual:\n")
-	for _, rule := range actual {
-		log.Printf("        - %s\n", rule)
+func printRuleSection(sectionName string, rules []string, indent string) {
+	log.Printf("%s- Missing %s Rules:\n", indent, sectionName)
+	for _, rule := range rules {
+		log.Printf("%s  - %s\n", indent, rule)
 	}
 }
