@@ -62,17 +62,17 @@ func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int,
 			} else {
 				log.Printf("❌ FAIL: %s", tc.Name)
 			}
-
+			indent := "    "
 			if !pass || verbosity >= 1 {
 				if verbosity >= 3 {
 					log.Println("  - Test Context:")
-					output.PrintTestContext(mergedContext, "    ")
+					output.PrintTestContext(mergedContext, indent)
 				}
 				if !pass || verbosity >= 1 {
-					output.PrintAssertionResult(assertionResult, verbosity)
+					output.PrintAssertionResult(assertionResult, verbosity, indent)
 				}
 				log.Println("  - Policy Evaluation Tree:")
-				output.PrintResultTree(&result, "    ", verbosity >= 3)
+				output.PrintResultTree(&result, indent, verbosity >= 3)
 			}
 		}
 
