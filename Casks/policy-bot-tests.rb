@@ -2,7 +2,7 @@
 cask "policy-bot-tests" do
   desc ""
   homepage ""
-  version "0.5.1"
+  version "0.5.2"
 
   livecheck do
     skip "Auto-generated on release."
@@ -12,23 +12,23 @@ cask "policy-bot-tests" do
 
   on_macos do
     on_intel do
-      url "https://github.com/reegnz/policy-bot-tests/releases/download/v0.5.1/policy-bot-tests_Darwin_x86_64.tar.gz"
-      sha256 "cd561702d7a29549f75d5aaa51d19fa71f6a852a55a841db5f9e89d1a3d8da75"
+      url "https://github.com/reegnz/policy-bot-tests/releases/download/v0.5.2/policy-bot-tests_Darwin_x86_64.tar.gz"
+      sha256 "264bbfdc6ddc30f6539784b71575b8c8d7146f9a490197e22c00fe023065583f"
     end
     on_arm do
-      url "https://github.com/reegnz/policy-bot-tests/releases/download/v0.5.1/policy-bot-tests_Darwin_arm64.tar.gz"
-      sha256 "e3fbe423870cb0eb42200f0093467ca3a9474786f784104a57b986301c3a785d"
+      url "https://github.com/reegnz/policy-bot-tests/releases/download/v0.5.2/policy-bot-tests_Darwin_arm64.tar.gz"
+      sha256 "d5e1fcba8b6ed8b46ec50bfa6ac2c6cd3ce59c8fa0c67bed25f88cb401d02717"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/reegnz/policy-bot-tests/releases/download/v0.5.1/policy-bot-tests_Linux_x86_64.tar.gz"
-      sha256 "3dee942e49ff9158969b9231cb349c9441d167ef02f13551feb722988533066b"
+      url "https://github.com/reegnz/policy-bot-tests/releases/download/v0.5.2/policy-bot-tests_Linux_x86_64.tar.gz"
+      sha256 "0c047c405d6e35b03093ff8068331f79ec50e0957057307b1f61619a22418b37"
     end
     on_arm do
-      url "https://github.com/reegnz/policy-bot-tests/releases/download/v0.5.1/policy-bot-tests_Linux_arm64.tar.gz"
-      sha256 "aa6511764b5c22e5928891c51fe29031e02eeafa2e45cefd2c3ffd2407092344"
+      url "https://github.com/reegnz/policy-bot-tests/releases/download/v0.5.2/policy-bot-tests_Linux_arm64.tar.gz"
+      sha256 "8096f53671848f58a84d46ff4b5ff2e63c559e7d94292aac4c04109e3e9654f7"
     end
   end
 
