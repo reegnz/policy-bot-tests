@@ -74,3 +74,27 @@ test_cases:
     - team-alpha-review
     must_be_pending:
     - team-beta-review
+
+- name: Comment approval by team alpha allowed
+  context:
+    files_changed:
+    - comment-approval-allowed/somefile.txt
+    comments:
+     - author: alpha-alice
+       body: "I approve this change"
+  assert:
+    evaluation_status: approved
+    must_be_approved:
+    - comment-approval-alpha
+
+- name: Comment approval by team beta disallowed
+  context:
+    files_changed:
+    - comment-approval-allowed/somefile.txt
+    comments:
+     - author: beta-alice
+       body: "I approve this change"
+  assert:
+    evaluation_status: pending
+    must_be_pending:
+    - comment-approval-alpha

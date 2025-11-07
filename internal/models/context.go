@@ -211,7 +211,7 @@ func (ghc *GitHubContext) PushedAt(sha string) (time.Time, error) {
 }
 
 // NewGitHubContext creates a new GitHubContext from test context data
-func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File, collaborators []*pull.Collaborator) *GitHubContext {
+func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File, collaborators []*pull.Collaborator, comments []*pull.Comment) *GitHubContext {
 	return &GitHubContext{
 		GitHubMembershipContext: *NewGitHubMembershipContext(tc.TeamMembers, tc.OrgMembers),
 		evalTimestamp:           time.Now(),
@@ -228,5 +228,6 @@ func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File
 		labels:        tc.Labels,
 		statuses:      tc.Statuses,
 		workflowRuns:  tc.WorkflowRuns,
+		comments:      comments,
 	}
 }
