@@ -2,7 +2,8 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "enabledManagers": [
     "github-actions",
-    "gomod"
+    "gomod",
+    "custom.regex"
   ],
   "lockFileMaintenance": {
     "enabled": true
@@ -20,6 +21,17 @@
         "indirect"
       ],
       "enabled": true
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/.+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s.*:\\s*(?<currentValue>[0-9.]+?)\\s"
+      ]
     }
   ]
 }
