@@ -10,7 +10,6 @@ require (
 )
 
 require (
-	github.com/google/go-github/v72 v72.0.0 // indirect
 	github.com/google/go-github/v75 v75.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
