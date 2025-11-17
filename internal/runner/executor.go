@@ -166,6 +166,9 @@ func MergeContexts(base, override models.TestContext) models.TestContext {
 	if len(override.OrgMembers) > 0 {
 		maps.Copy(merged.OrgMembers, override.OrgMembers)
 	}
+	if len(override.Comments) > 0 {
+		merged.Comments = override.Comments
+	}
 
 	return merged
 }
@@ -210,5 +213,13 @@ func NewPullContext(tc models.TestContext) pull.Context {
 		}
 	}
 
-	return models.NewGitHubContext(tc, reviews, files, collaborators)
+	comments := []*pull.Comment{}
+	for _, c := range tc.Comments {
+		comments = append(comments, &pull.Comment{
+			Author: c.Author,
+			Body:   c.Body,
+		})
+	}
+
+	return models.NewGitHubContext(tc, reviews, files, collaborators, comments)
 }

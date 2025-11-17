@@ -3,6 +3,7 @@ policy:
   approval:
   - team-alpha-review
   - team-beta-review
+  - comment-approval-alpha
 
 approval_rules:
 - name: team-alpha-review
@@ -27,3 +28,16 @@ approval_rules:
     count: 1
     teams:
     - test/team-beta
+- name: comment-approval-alpha
+  if:
+    changed_files:
+      paths:
+      - ^comment-approval-allowed/.*$
+  requires:
+    count: 1
+    teams:
+    - test/team-alpha
+  options:
+    methods:
+      comment_patterns:
+      - (?i)i approve

@@ -32,6 +32,7 @@ type TestContext struct {
 	Labels       []string            `yaml:"labels"`
 	TeamMembers  map[string][]string `yaml:"team_members"`
 	OrgMembers   map[string][]string `yaml:"org_members"`
+	Comments     []TestComment       `yaml:"comments"`
 }
 
 // TestPullRequest is a simplified version of a PR for YAML parsing
@@ -44,6 +45,11 @@ type TestPullRequest struct {
 type TestReview struct {
 	Author string `yaml:"author"`
 	State  string `yaml:"state"`
+}
+
+type TestComment struct {
+	Author string `yaml:"author"`
+	Body   string `yaml:"body"`
 }
 
 // TestAssertion defines the expected outcomes of a test case
