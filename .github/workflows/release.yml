@@ -29,7 +29,7 @@ jobs:
       uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
       with:
         # renovate: datasource=github-releases packageName=goreleaser/goreleaser
-        version: 2.12.7
+        version: 2.13.0
         args: release --clean
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
