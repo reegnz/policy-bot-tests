@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/palantir/policy-bot v1.39.3
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
