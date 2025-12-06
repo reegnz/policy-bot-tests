@@ -3,14 +3,14 @@ module github.com/reegnz/policy-bot-tests
 go 1.25.0
 
 require (
-	github.com/palantir/policy-bot v1.39.3
-	github.com/spf13/cobra v1.10.1
+	github.com/palantir/policy-bot v1.40.1
+	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/google/go-github/v75 v75.0.0 // indirect
+	github.com/google/go-github/v79 v79.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
