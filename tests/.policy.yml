@@ -4,6 +4,7 @@ policy:
   - team-alpha-review
   - team-beta-review
   - comment-approval-alpha
+  - approve with magic property
 
 approval_rules:
 - name: team-alpha-review
@@ -41,3 +42,8 @@ approval_rules:
     methods:
       comment_patterns:
       - (?i)i approve
+- name: approve with magic property
+  if:
+    custom_property_matches_any_of:
+      approve_me:
+        - "^yes$"

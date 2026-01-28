@@ -98,3 +98,23 @@ test_cases:
     evaluation_status: pending
     must_be_pending:
     - comment-approval-alpha
+
+- name: Approved with expected custom property
+  context:
+    custom_properties:
+      approve_me:
+        string: "yes"
+  assert:
+    evaluation_status: approved
+    must_be_approved:
+    - approve with magic property
+
+- name: Skip with missing expected custom property
+  context:
+    custom_properties:
+      approve_me:
+        string: "no"
+  assert:
+    evaluation_status: skipped
+    must_be_skipped:
+    - approve with magic property
