@@ -169,6 +169,12 @@ func MergeContexts(base, override models.TestContext) models.TestContext {
 	if len(override.Comments) > 0 {
 		merged.Comments = override.Comments
 	}
+	if len(override.CustomProperties) > 0 {
+		if merged.CustomProperties == nil {
+			merged.CustomProperties = make(map[string]models.TestContextCustomProperty)
+		}
+		maps.Copy(merged.CustomProperties, override.CustomProperties)
+	}
 
 	return merged
 }
@@ -221,5 +227,13 @@ func NewPullContext(tc models.TestContext) pull.Context {
 		})
 	}
 
-	return models.NewGitHubContext(tc, reviews, files, collaborators, comments)
+	customProperties := make(map[string]pull.CustomProperty)
+	for k, v := range tc.CustomProperties {
+		customProperties[k] = pull.CustomProperty{
+			String: v.String,
+			Array:  v.Array,
+		}
+	}
+
+	return models.NewGitHubContext(tc, reviews, files, collaborators, comments, customProperties)
 }

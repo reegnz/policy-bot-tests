@@ -1,6 +1,8 @@
 package models
 
-import "slices"
+import (
+	"slices"
+)
 
 // TestFile matches the root of the .policy-tests.yml file
 type TestFile struct {
@@ -17,22 +19,30 @@ type TestCase struct {
 	FileName   string        `yaml:"-"`
 }
 
+// TestContextCustomProperty is the same as a pull.CustomProperty, but
+// adds YAML tags
+type TestContextCustomProperty struct {
+	String *string  `yaml:"string,omitempty"`
+	Array  []string `yaml:"array,omitempty"`
+}
+
 // TestContext is a simplified version of GitHubContext for easy YAML parsing
 type TestContext struct {
-	FilesChanged []string            `yaml:"files_changed"`
-	FilesAdded   []string            `yaml:"files_added"`
-	FilesDeleted []string            `yaml:"files_deleted"`
-	Author       string              `yaml:"author"`
-	Owner        string              `yaml:"owner"`
-	Repo         string              `yaml:"repo"`
-	PR           TestPullRequest     `yaml:"pr"`
-	Reviews      []TestReview        `yaml:"reviews"`
-	Statuses     map[string]string   `yaml:"statuses"`
-	WorkflowRuns map[string][]string `yaml:"workflow_runs"`
-	Labels       []string            `yaml:"labels"`
-	TeamMembers  map[string][]string `yaml:"team_members"`
-	OrgMembers   map[string][]string `yaml:"org_members"`
-	Comments     []TestComment       `yaml:"comments"`
+	FilesChanged     []string                             `yaml:"files_changed"`
+	FilesAdded       []string                             `yaml:"files_added"`
+	FilesDeleted     []string                             `yaml:"files_deleted"`
+	Author           string                               `yaml:"author"`
+	Owner            string                               `yaml:"owner"`
+	Repo             string                               `yaml:"repo"`
+	PR               TestPullRequest                      `yaml:"pr"`
+	Reviews          []TestReview                         `yaml:"reviews"`
+	Statuses         map[string]string                    `yaml:"statuses"`
+	WorkflowRuns     map[string][]string                  `yaml:"workflow_runs"`
+	Labels           []string                             `yaml:"labels"`
+	TeamMembers      map[string][]string                  `yaml:"team_members"`
+	OrgMembers       map[string][]string                  `yaml:"org_members"`
+	Comments         []TestComment                        `yaml:"comments"`
+	CustomProperties map[string]TestContextCustomProperty `yaml:"custom_properties"`
 }
 
 // TestPullRequest is a simplified version of a PR for YAML parsing

@@ -64,13 +64,14 @@ type GitHubContext struct {
 	number        int
 	pr            PullRequest
 
-	files         []*pull.File
-	commits       []*pull.Commit
-	comments      []*pull.Comment
-	reviews       []*pull.Review
-	reviewers     []*pull.Reviewer
-	collaborators []*pull.Collaborator
-	labels        []string
+	files            []*pull.File
+	commits          []*pull.Commit
+	comments         []*pull.Comment
+	reviews          []*pull.Review
+	reviewers        []*pull.Reviewer
+	collaborators    []*pull.Collaborator
+	customProperties map[string]pull.CustomProperty
+	labels           []string
 
 	pushedAt     map[string]time.Time
 	statuses     map[string]string
@@ -165,8 +166,12 @@ func (ghc *GitHubContext) Reviews() ([]*pull.Review, error) {
 	return ghc.reviews, nil
 }
 
-func (ghc *GitHubContext) RepositoryCollaborators() ([]*pull.Collaborator, error) {
+func (ghc *GitHubContext) RepositoryCollaborators(p pull.Permission) ([]*pull.Collaborator, error) {
 	return ghc.collaborators, nil
+}
+
+func (ghc *GitHubContext) RepositoryCustomProperties() (map[string]pull.CustomProperty, error) {
+	return ghc.customProperties, nil
 }
 
 func (ghc *GitHubContext) CollaboratorPermission(user string) (pull.Permission, error) {
@@ -211,7 +216,7 @@ func (ghc *GitHubContext) PushedAt(sha string) (time.Time, error) {
 }
 
 // NewGitHubContext creates a new GitHubContext from test context data
-func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File, collaborators []*pull.Collaborator, comments []*pull.Comment) *GitHubContext {
+func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File, collaborators []*pull.Collaborator, comments []*pull.Comment, customProperties map[string]pull.CustomProperty) *GitHubContext {
 	return &GitHubContext{
 		GitHubMembershipContext: *NewGitHubMembershipContext(tc.TeamMembers, tc.OrgMembers),
 		evalTimestamp:           time.Now(),
@@ -222,12 +227,13 @@ func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File
 			baseRefName: tc.PR.BaseRefName,
 			headRefName: tc.PR.HeadRefName,
 		},
-		files:         files,
-		reviews:       reviews,
-		collaborators: collaborators,
-		labels:        tc.Labels,
-		statuses:      tc.Statuses,
-		workflowRuns:  tc.WorkflowRuns,
-		comments:      comments,
+		files:            files,
+		reviews:          reviews,
+		collaborators:    collaborators,
+		customProperties: customProperties,
+		labels:           tc.Labels,
+		statuses:         tc.Statuses,
+		workflowRuns:     tc.WorkflowRuns,
+		comments:         comments,
 	}
 }
