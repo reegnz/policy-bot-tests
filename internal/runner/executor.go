@@ -7,7 +7,6 @@ import (
 	"regexp"
 
 	"github.com/palantir/policy-bot/policy/common"
-	"github.com/palantir/policy-bot/pull"
 	"github.com/reegnz/policy-bot-tests/internal/models"
 	"github.com/reegnz/policy-bot-tests/internal/output"
 )
@@ -45,7 +44,7 @@ func RunTests(evaluator common.Evaluator, tests *models.TestFile, verbosity int,
 	passedCount := 0
 	for _, tc := range filteredCases {
 		mergedContext := MergeContexts(tests.DefaultContext, tc.Context)
-		pullContext := NewPullContext(mergedContext)
+		pullContext := models.NewGitHubContext(mergedContext)
 		result := evaluator.Evaluate(context.Background(), pullContext)
 
 		assertionResult := CheckAssertions(tc.Assert, &result)
@@ -171,55 +170,4 @@ func MergeContexts(base, override models.TestContext) models.TestContext {
 	}
 
 	return merged
-}
-
-// NewPullContext creates a pull.Context from test context data
-func NewPullContext(tc models.TestContext) pull.Context {
-	reviews := []*pull.Review{}
-	for _, r := range tc.Reviews {
-		reviews = append(reviews, &pull.Review{
-			Author: r.Author,
-			State:  pull.ReviewState(r.State),
-		})
-	}
-
-	files := []*pull.File{}
-	for _, f := range tc.FilesChanged {
-		files = append(files, &pull.File{Filename: f, Status: pull.FileModified})
-	}
-	for _, f := range tc.FilesAdded {
-		files = append(files, &pull.File{Filename: f, Status: pull.FileAdded})
-	}
-	for _, f := range tc.FilesDeleted {
-		files = append(files, &pull.File{Filename: f, Status: pull.FileDeleted})
-	}
-
-	collaborators := []*pull.Collaborator{}
-	seenCollaborators := map[string]bool{}
-	for _, members := range tc.TeamMembers {
-		for _, member := range members {
-			if !seenCollaborators[member] {
-				collaborators = append(collaborators, &pull.Collaborator{
-					Name: member,
-					Permissions: []pull.CollaboratorPermission{
-						{
-							Permission: pull.PermissionWrite,
-							ViaRepo:    true,
-						},
-					},
-				})
-				seenCollaborators[member] = true
-			}
-		}
-	}
-
-	comments := []*pull.Comment{}
-	for _, c := range tc.Comments {
-		comments = append(comments, &pull.Comment{
-			Author: c.Author,
-			Body:   c.Body,
-		})
-	}
-
-	return models.NewGitHubContext(tc, reviews, files, collaborators, comments)
 }

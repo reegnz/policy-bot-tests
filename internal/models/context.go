@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	_ pull.Context           = &pull.GitHubContext{}
+	_ pull.Context           = &GitHubContext{}
 	_ pull.MembershipContext = &GitHubMembershipContext{}
 )
 
@@ -153,6 +153,10 @@ func (ghc *GitHubContext) ChangedFiles() ([]*pull.File, error) {
 	return ghc.files, nil
 }
 
+func (ghc *GitHubContext) RepositoryCustomProperties() (map[string]pull.CustomProperty, error) {
+	return map[string]pull.CustomProperty{}, nil
+}
+
 func (ghc *GitHubContext) Commits() ([]*pull.Commit, error) {
 	return ghc.commits, nil
 }
@@ -165,7 +169,7 @@ func (ghc *GitHubContext) Reviews() ([]*pull.Review, error) {
 	return ghc.reviews, nil
 }
 
-func (ghc *GitHubContext) RepositoryCollaborators() ([]*pull.Collaborator, error) {
+func (ghc *GitHubContext) RepositoryCollaborators(minPermission pull.Permission) ([]*pull.Collaborator, error) {
 	return ghc.collaborators, nil
 }
 
@@ -210,8 +214,66 @@ func (ghc *GitHubContext) PushedAt(sha string) (time.Time, error) {
 	return ghc.pushedAt[sha], nil
 }
 
+func NewCollaborators(teamMembers map[string][]string) []*pull.Collaborator {
+	collaborators := []*pull.Collaborator{}
+	seenCollaborators := map[string]bool{}
+	for _, members := range teamMembers {
+		for _, member := range members {
+			if !seenCollaborators[member] {
+				collaborators = append(collaborators, &pull.Collaborator{
+					Name: member,
+					Permissions: []pull.CollaboratorPermission{
+						{
+							Permission: pull.PermissionWrite,
+							ViaRepo:    true,
+						},
+					},
+				})
+				seenCollaborators[member] = true
+			}
+		}
+	}
+	return collaborators
+}
+
+func NewFiles(filesAdded, filesChanged, filesDeleted []string) []*pull.File {
+	files := []*pull.File{}
+	for _, f := range filesAdded {
+		files = append(files, &pull.File{Filename: f, Status: pull.FileAdded})
+	}
+	for _, f := range filesChanged {
+		files = append(files, &pull.File{Filename: f, Status: pull.FileModified})
+	}
+	for _, f := range filesDeleted {
+		files = append(files, &pull.File{Filename: f, Status: pull.FileDeleted})
+	}
+	return files
+}
+
+func NewReviews(testReviews []TestReview) []*pull.Review {
+	reviews := []*pull.Review{}
+	for _, r := range testReviews {
+		reviews = append(reviews, &pull.Review{
+			Author: r.Author,
+			State:  pull.ReviewState(r.State),
+		})
+	}
+	return reviews
+}
+
+func NewComments(testComments []TestComment) []*pull.Comment {
+	comments := []*pull.Comment{}
+	for _, c := range testComments {
+		comments = append(comments, &pull.Comment{
+			Author: c.Author,
+			Body:   c.Body,
+		})
+	}
+	return comments
+}
+
 // NewGitHubContext creates a new GitHubContext from test context data
-func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File, collaborators []*pull.Collaborator, comments []*pull.Comment) *GitHubContext {
+func NewGitHubContext(tc TestContext) *GitHubContext {
 	return &GitHubContext{
 		GitHubMembershipContext: *NewGitHubMembershipContext(tc.TeamMembers, tc.OrgMembers),
 		evalTimestamp:           time.Now(),
@@ -222,12 +284,12 @@ func NewGitHubContext(tc TestContext, reviews []*pull.Review, files []*pull.File
 			baseRefName: tc.PR.BaseRefName,
 			headRefName: tc.PR.HeadRefName,
 		},
-		files:         files,
-		reviews:       reviews,
-		collaborators: collaborators,
+		files:         NewFiles(tc.FilesAdded, tc.FilesChanged, tc.FilesDeleted),
+		reviews:       NewReviews(tc.Reviews),
+		collaborators: NewCollaborators(tc.TeamMembers),
 		labels:        tc.Labels,
 		statuses:      tc.Statuses,
 		workflowRuns:  tc.WorkflowRuns,
-		comments:      comments,
+		comments:      NewComments(tc.Comments),
 	}
 }
