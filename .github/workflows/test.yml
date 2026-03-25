@@ -45,6 +45,6 @@ jobs:
       uses: goreleaser/goreleaser-action@ec59f474b9834571250b370d4735c50f8e2d1e29 # v7.0.0
       with:
         # renovate: datasource=github-releases packageName=goreleaser/goreleaser
-        version: 2.13.3
+        version: 2.14.3
         args: build --snapshot --clean
 
