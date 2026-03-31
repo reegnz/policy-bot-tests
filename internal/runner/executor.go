@@ -168,6 +168,9 @@ func MergeContexts(base, override models.TestContext) models.TestContext {
 	if len(override.Comments) > 0 {
 		merged.Comments = override.Comments
 	}
+	if len(override.CustomProperties) > 0 {
+		maps.Copy(merged.CustomProperties, override.CustomProperties)
+	}
 
 	return merged
 }

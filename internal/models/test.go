@@ -17,6 +17,11 @@ type TestCase struct {
 	FileName   string        `yaml:"-"`
 }
 
+type TestCustomProperty struct {
+	String *string  `yaml:"string,omitempty"`
+	Array  []string `yaml:"array,omitempty"`
+}
+
 // TestContext is a simplified version of GitHubContext for easy YAML parsing
 type TestContext struct {
 	FilesChanged []string            `yaml:"files_changed"`
@@ -33,6 +38,37 @@ type TestContext struct {
 	TeamMembers  map[string][]string `yaml:"team_members"`
 	OrgMembers   map[string][]string `yaml:"org_members"`
 	Comments     []TestComment       `yaml:"comments"`
+
+	CustomProperties map[string]TestCustomProperty `yaml:"custom_properties"`
+}
+
+// NewTestContext returns a copy of the context with nil maps replaced by empty maps.
+func NewTestContext(tc TestContext) TestContext {
+	if tc.Statuses == nil {
+		tc.Statuses = map[string]string{}
+	}
+	if tc.WorkflowRuns == nil {
+		tc.WorkflowRuns = map[string][]string{}
+	}
+	if tc.TeamMembers == nil {
+		tc.TeamMembers = map[string][]string{}
+	}
+	if tc.OrgMembers == nil {
+		tc.OrgMembers = map[string][]string{}
+	}
+	if tc.CustomProperties == nil {
+		tc.CustomProperties = map[string]TestCustomProperty{}
+	}
+	return tc
+}
+
+// NewTestFile returns a copy of the file with all nested contexts normalized.
+func NewTestFile(tf TestFile) TestFile {
+	tf.DefaultContext = NewTestContext(tf.DefaultContext)
+	for i := range tf.TestCases {
+		tf.TestCases[i].Context = NewTestContext(tf.TestCases[i].Context)
+	}
+	return tf
 }
 
 // TestPullRequest is a simplified version of a PR for YAML parsing
