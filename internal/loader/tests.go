@@ -63,6 +63,7 @@ func LoadTestFiles(paths []string) (*models.TestFile, error) {
 		if err := decoder.Decode(&tests); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal %s: %w", file, err)
 		}
+		tests = models.NewTestFile(tests)
 
 		extractLineNumbers(&node, &tests)
 

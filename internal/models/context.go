@@ -72,9 +72,10 @@ type GitHubContext struct {
 	collaborators []*pull.Collaborator
 	labels        []string
 
-	pushedAt     map[string]time.Time
-	statuses     map[string]string
-	workflowRuns map[string][]string
+	pushedAt         map[string]time.Time
+	statuses         map[string]string
+	workflowRuns     map[string][]string
+	customProperties map[string]pull.CustomProperty
 }
 
 // PullRequest represents a GitHub pull request
@@ -154,7 +155,7 @@ func (ghc *GitHubContext) ChangedFiles() ([]*pull.File, error) {
 }
 
 func (ghc *GitHubContext) RepositoryCustomProperties() (map[string]pull.CustomProperty, error) {
-	return map[string]pull.CustomProperty{}, nil
+	return ghc.customProperties, nil
 }
 
 func (ghc *GitHubContext) Commits() ([]*pull.Commit, error) {
@@ -272,6 +273,17 @@ func NewComments(testComments []TestComment) []*pull.Comment {
 	return comments
 }
 
+func NewCustomProperties(testCustomProperties map[string]TestCustomProperty) map[string]pull.CustomProperty {
+	customProperties := make(map[string]pull.CustomProperty)
+	for k, v := range testCustomProperties {
+		customProperties[k] = pull.CustomProperty{
+			String: v.String,
+			Array:  v.Array,
+		}
+	}
+	return customProperties
+}
+
 // NewGitHubContext creates a new GitHubContext from test context data
 func NewGitHubContext(tc TestContext) *GitHubContext {
 	return &GitHubContext{
@@ -284,12 +296,13 @@ func NewGitHubContext(tc TestContext) *GitHubContext {
 			baseRefName: tc.PR.BaseRefName,
 			headRefName: tc.PR.HeadRefName,
 		},
-		files:         NewFiles(tc.FilesAdded, tc.FilesChanged, tc.FilesDeleted),
-		reviews:       NewReviews(tc.Reviews),
-		collaborators: NewCollaborators(tc.TeamMembers),
-		labels:        tc.Labels,
-		statuses:      tc.Statuses,
-		workflowRuns:  tc.WorkflowRuns,
-		comments:      NewComments(tc.Comments),
+		files:            NewFiles(tc.FilesAdded, tc.FilesChanged, tc.FilesDeleted),
+		reviews:          NewReviews(tc.Reviews),
+		collaborators:    NewCollaborators(tc.TeamMembers),
+		labels:           tc.Labels,
+		statuses:         tc.Statuses,
+		workflowRuns:     tc.WorkflowRuns,
+		comments:         NewComments(tc.Comments),
+		customProperties: NewCustomProperties(tc.CustomProperties),
 	}
 }
