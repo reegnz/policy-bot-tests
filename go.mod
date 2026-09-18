@@ -1,6 +1,6 @@
 module github.com/reegnz/policy-bot-tests
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/palantir/policy-bot v1.41.1
